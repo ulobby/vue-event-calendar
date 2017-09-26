@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/GeoffZhu/vue-event-calendar"
+    "url": "git+https://github.com/ulobby/vue-event-calendar"
   },
   "main": "dist/index.js",
   "dependencies": {
@@ -37,7 +37,7 @@
     "vue-event-calendar"
   ],
   "bugs": {
-    "url": "https://github.com/GeoffZhu/vue-event-calendar/issues"
+    "url": "https://github.com/ulobby/vue-event-calendar/issues"
   },
   "homepage": "http://geoffzhu.cn/vue-event-calendar/"
 }
