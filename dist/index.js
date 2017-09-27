@@ -265,13 +265,21 @@ module.exports = function normalizeComponent (
     dayEventsTitle: 'Tutti gli eventi',
     notHaveEvents: 'Nessun evento'
   },
-  da: {
-    dayNames: ["Søn", "Man", "Tir", "Ons", "Tor", "Fre", "Lør"],
-    monthNames: ["Januar", "Februar", "Mats", "April", "Maj", "Juni", "Juli", "August", "September", "Oktober", "November", "December"],
+  ru: {
+    dayNames: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+    monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
     format: 'MM/yyyy',
     fullFormat: 'dd/MM/yyyy',
-    dayEventsTitle: 'Alle møder',
-    notHaveEvents: 'Ingen møder'
+    dayEventsTitle: 'Все события',
+    notHaveEvents: 'События отсутствуют'
+  },
+  sv: {
+    dayNames: ["Sön", "Mån", "Tis", "Ons", "Tor", "Fre", "Lör"],
+    monthNames: ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"],
+    format: 'MM/yyyy',
+    fullFormat: 'dd/MM/yyyy',
+    dayEventsTitle: 'Alla händelser',
+    notHaveEvents: 'Inga händelser'
   }
 });
 
@@ -491,6 +499,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -520,14 +532,26 @@ var inBrowser = typeof window !== 'undefined';
   },
   computed: {
     dayList: function dayList() {
-      var firstDay = new Date(this.calendar.params.curYear + '/' + (this.calendar.params.curMonth + 1) + '/01');
-      var startTimestamp = firstDay - 1000 * 60 * 60 * 24 * firstDay.getDay();
+      var firstDay = new Date(this.calendar.params.curYear, this.calendar.params.curMonth, 1);
+      var dayOfWeek = firstDay.getDay();
+      // 根据当前日期计算偏移量
+      if (this.calendar.options.weekStartOn > dayOfWeek) {
+        dayOfWeek = dayOfWeek - this.calendar.options.weekStartOn + 7;
+      } else if (this.calendar.options.weekStartOn < dayOfWeek) {
+        dayOfWeek = dayOfWeek - this.calendar.options.weekStartOn;
+      }
+
+      var startDate = new Date(firstDay);
+      startDate.setDate(firstDay.getDate() - dayOfWeek);
+
       var item = void 0,
           status = void 0,
           tempArr = [],
           tempItem = void 0;
       for (var i = 0; i < 42; i++) {
-        item = new Date(startTimestamp + i * 1000 * 60 * 60 * 24);
+        item = new Date(startDate);
+        item.setDate(startDate.getDate() + i);
+
         if (this.calendar.params.curMonth === item.getMonth()) {
           status = 1;
         } else {
@@ -569,7 +593,9 @@ var inBrowser = typeof window !== 'undefined';
       this.$emit('month-changed', this.curYearMonth);
     },
     handleChangeCurday: function handleChangeCurday(date) {
-      this.$emit('cur-day-changed', date.date);
+      if (date.status) {
+        this.$emit('cur-day-changed', date.date);
+      }
     }
   }
 });
@@ -670,7 +696,7 @@ var inBrowser = typeof window !== 'undefined';
           curYear: dateObj.getFullYear(),
           curMonth: dateObj.getMonth(),
           curDate: dateObj.getDate(),
-          curEventsDate: dateString
+          curEventsDate: 'all'
         };
       }
     }
@@ -686,10 +712,12 @@ var inBrowser = typeof window !== 'undefined';
       var events = this.events.filter(function (event) {
         return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__tools_js__["a" /* isEqualDateStr */])(event.date, date);
       });
-      this.selectedDayEvents = {
-        date: date,
-        events: events
-      };
+      if (events.length > 0) {
+        this.selectedDayEvents = {
+          date: date,
+          events: events
+        };
+      }
       this.$emit('day-changed', {
         date: date,
         events: events
@@ -701,8 +729,16 @@ var inBrowser = typeof window !== 'undefined';
   },
   watch: {
     calendarParams: function calendarParams() {
+      var _this = this;
+
       if (this.calendarParams.curEventsDate !== 'all') {
-        this.handleChangeCurDay(this.calendarParams.curEventsDate);
+        var events = this.events.filter(function (event) {
+          return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__tools_js__["a" /* isEqualDateStr */])(event.date, _this.calendarParams.curEventsDate);
+        });
+        this.selectedDayEvents = {
+          date: this.calendarParams.curEventsDate,
+          events: events
+        };
       } else {
         this.selectedDayEvents = {
           date: 'all',
@@ -740,9 +776,10 @@ function install(Vue) {
   var inBrowser = typeof window !== 'undefined';
   var dateObj = new Date();
   var DEFAULT_OPTION = {
-    locale: 'zh', //en
+    locale: 'zh', // en
     color: ' #f29543',
-    className: 'selected-day'
+    className: 'selected-day',
+    weekStartOn: 0 // 0 mean sunday
   };
   var Calendar = {
     $vm: null,
@@ -979,10 +1016,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "cal-body"
   }, [_c('div', {
     staticClass: "weeks"
-  }, _vm._l((_vm.i18n[_vm.calendar.options.locale].dayNames), function(dayName) {
+  }, _vm._l((_vm.i18n[_vm.calendar.options.locale].dayNames), function(dayName, dayIndex) {
     return _c('span', {
       staticClass: "item"
-    }, [_vm._v(_vm._s(dayName))])
+    }, [_vm._v("\n        " + _vm._s(_vm.i18n[_vm.calendar.options.locale].dayNames[(dayIndex + _vm.calendar.options.weekStartOn) % 7]) + "\n      ")])
   })), _vm._v(" "), _c('div', {
     staticClass: "dates"
   }, _vm._l((_vm.dayList), function(date) {

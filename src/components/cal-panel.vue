@@ -7,7 +7,11 @@
     </div>
     <div class="cal-body">
       <div class="weeks">
-        <span v-for="dayName in i18n[calendar.options.locale].dayNames" class="item">{{dayName}}</span>
+        <span
+          v-for="(dayName, dayIndex) in i18n[calendar.options.locale].dayNames"
+          class="item">
+          {{i18n[calendar.options.locale].dayNames[(dayIndex + calendar.options.weekStartOn) % 7]}}
+        </span>
       </div>
       <div class="dates" >
         <div v-for="date in dayList" class="item"
@@ -57,11 +61,23 @@ export default {
   },
   computed: {
     dayList () {
-        let firstDay = new Date(this.calendar.params.curYear+'/'+(this.calendar.params.curMonth+1)+'/01')
-        let startTimestamp = firstDay-1000*60*60*24*firstDay.getDay()
+        let firstDay = new Date(this.calendar.params.curYear, this.calendar.params.curMonth, 1)
+        let dayOfWeek = firstDay.getDay()
+        // 根据当前日期计算偏移量
+        if (this.calendar.options.weekStartOn > dayOfWeek) {
+          dayOfWeek = dayOfWeek - this.calendar.options.weekStartOn + 7
+        } else if (this.calendar.options.weekStartOn < dayOfWeek) {
+          dayOfWeek = dayOfWeek - this.calendar.options.weekStartOn
+        }
+
+        let startDate = new Date(firstDay)
+        startDate.setDate(firstDay.getDate() - dayOfWeek)
+
         let item, status, tempArr = [], tempItem
         for (let i = 0 ; i < 42 ; i++) {
-            item = new Date(startTimestamp + i*1000*60*60*24)
+            item = new Date(startDate);
+            item.setDate(startDate.getDate() + i);
+
             if (this.calendar.params.curMonth === item.getMonth()) {
               status = 1
             } else {
@@ -103,7 +119,9 @@ export default {
       this.$emit('month-changed', this.curYearMonth)
     },
     handleChangeCurday (date) {
-      this.$emit('cur-day-changed', date.date)
+      if (date.status) {
+        this.$emit('cur-day-changed', date.date)
+      }
     }
   }
 }
