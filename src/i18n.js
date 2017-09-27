@@ -86,4 +86,5 @@ export default {
     fullFormat: 'dd/MM/yyyy',
     dayEventsTitle: 'Alla händelser',
     notHaveEvents: 'Inga händelser'
+  }
 }

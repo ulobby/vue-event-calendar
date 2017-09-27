@@ -265,6 +265,14 @@ module.exports = function normalizeComponent (
     dayEventsTitle: 'Tutti gli eventi',
     notHaveEvents: 'Nessun evento'
   },
+  da: {
+    dayNames: ["Søn", "Man", "Tir", "Ons", "Tor", "Fre", "Lør"],
+    monthNames: ["Januar", "Februar", "Mats", "April", "Maj", "Juni", "Juli", "August", "September", "Oktober", "November", "December"],
+    format: 'MM/yyyy',
+    fullFormat: 'dd/MM/yyyy',
+    dayEventsTitle: 'Alle møder',
+    notHaveEvents: 'Ingen møder'
+  },
   ru: {
     dayNames: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
     monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
